@@ -10,21 +10,21 @@ class AllocateElective:
 		self.preferences = pd.read_csv(configs.preferences_file).values
 
 		#Getting specifications from the configs file
-		totalStudents = configs.totalStudents #Total number of students
-		numberofElectives = configs.numberofElectives #Number of Electives
-		class_strengths = configs.class_strengths #Strength of each Elective (list)
-		generations = configs.generations #Number of generations the algorithm will perform
-		population_cap = configs.population_cap #Size of the population per generation
+		self.totalStudents = configs.totalStudents #Total number of students
+		self.numberofElectives = configs.numberofElectives #Number of Electives
+		self.class_strengths = configs.class_strengths #Strength of each Elective (list)
+		self.generations = configs.generations #Number of generations the algorithm will perform
+		self.population_cap = configs.population_cap #Size of the population per generation
 
 		#Creating the first generation population
 
 		#First chromosome has alphabetical order
 		#Creating a list with values from 0 to (Number of Students - 1), each representing a student
-		self.chromosome = [int(i) for i in range(0,totalStudents)]
+		self.chromosome = [int(i) for i in range(0,self.totalStudents)]
 
-		for i in range(0,population_cap):
+		for i in range(0,self.population_cap):
 
-			for j in range(0,totalStudents):
+			for j in range(0,self.totalStudents):
 
 				self.population[i][j] = self.chromosome[j]
 
@@ -40,9 +40,34 @@ class AllocateElective:
 			#Randomly shuffle the chromosome to create rest of the population
 			numpy.random.shuffle(self.chromosome)
 
+
+		for g in range(generations) :
+
+            #print("GEN : " + str(gen+1))
+
+            #Get parents from previous generation
+            self.__parentloader()
+
+            #Perform PMX cross-over
+            self.__PMX()
+
+            #Create rest of the population by mutating the child-chromosomes of selected parents after cross-over
+            self.__nextgenpop2()
+            self.population.sort(key=lambda i:i[self.totalStudents],reverse=True)
+
+
+            #self.store_avg_fitness()
+            #self.store_top_alloc()
+            #print(self.population)
+            #numpy.savetxt("Z:\EAinPY\pypops" + str(gen+1) + ".txt",numpy.array(self.population),fmt='%1.1d',delimiter = ' ',newline = '\n')
+            
+            self.currentGeneration += 1
+
 		#TO-DO
 		#-Support functions
 		#-Write code for rest of the generations 
+		#-Add mutation functions
+		#-Add cross-over functions
 
 
 	#Calculates fitness for current allocation
@@ -53,9 +78,9 @@ class AllocateElective:
         #List to score allocation details
         self.fitnessDetails = [0 for l1 in range(5)]
         
-        for l1 in range(numberofElectives):
+        for l1 in range(self.numberofElectives):
 
-            for l2 in range(totalStudents):
+            for l2 in range(self.totalStudents):
 
             	#Store allocation details
             	#Each index stores how much students have been given electives as per their preferences
@@ -76,14 +101,14 @@ class AllocateElective:
     def allocate(self, chromosome):
 
     	#Empty allocation
-    	self.allocation = [[0 for i in range(totalStudents)] for j in range(numberofElectives)]
+    	self.allocation = [[0 for i in range(self.totalStudents)] for j in range(self.numberofElectives)]
 
     	for s in range(totalStudents):
 
     		#Allocating electives to each student one-by-one 
     		currentStudent = chromosome[s]
 
-    		for e in range(numberofElectives):
+    		for e in range(self.numberofElectives):
 
     			preferrefElective = self.findPreferredElective(e,currentStudent)
     			
@@ -97,9 +122,9 @@ class AllocateElective:
     def findPreferredElective(self,n,student):
 
     	#Empty preference table 
-    	studentPreference = [[0 for i in range(2)] for j in range(numberofElectives)]
+    	studentPreference = [[0 for i in range(2)] for j in range(self.numberofElectives)]
 
-        for pfi in range(numberofElectives):
+        for pfi in range(self.numberofElectives):
 
         	#Preferences
             studentPreference[pfi][0] = self.preferences[pfi][student]
@@ -118,7 +143,8 @@ class AllocateElective:
 
         currentStrength = 0
 
-        currentStrength = sum(int(self.allocation[elective][v]) for v in range(totalStudents))
+        #Find the number of students already allocated to the elective
+        currentStrength = sum(int(self.allocation[elective][v]) for v in range(self.totalStudents))
 
         if (currentStrength < class_strengths[elective]) :
 
