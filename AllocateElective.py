@@ -32,10 +32,10 @@ class AllocateElective:
 			self.allocate(self.chromosome) #Stores allocation in self.allocation
 
 			#Get Fitness for the allocation
-			self.fitnesScore = self.calculateFitness(self.allocation) 
+			self.fitnessScore = self.calculateFitness(self.allocation) 
 			
 			#Store the fitness score along with the corresponding chromosome
-			self.population[i][students] = self.fitnesScore
+			self.population[i][students] = self.fitnessScore
 
 			#Randomly shuffle the chromosome to create rest of the population
 			numpy.random.shuffle(self.chromosome)
@@ -160,3 +160,25 @@ class AllocateElective:
 
         self.parent1 = [self.population[0][i] for i in range(totalStudents)]  
         self.parent2 = [self.population[1][i] for i in range(totalStudents)]
+
+
+    #Creates population by mutating two child-chromosomes
+    def __nextgenpop2(self):
+
+        for i in range(self.population_cap/2) :
+
+            for j in range(self.totalStudents) :
+
+                self.population[i][j] = self.child1[j]
+                self.population[i+5][j] = self.child2[j]
+
+            self.allocate(self.child1)
+            self.fitnessScore = self.calculateFitness(self.allocation)
+            self.population[i][totalStudents] = self.fitnessScore
+
+            self.allocate(self.child2)
+            self.fitnessScore = self.calculateFitness(self.allocation)
+            self.population[i+5][totalStudents] = self.fitnessScore       
+
+            self.__mutate_insert(self.child1) #Using insert-mutation
+            self.__mutate_insert(self.child2) #Using insert-mutation
