@@ -113,6 +113,7 @@ class AllocateElective:
 
     			preferrefElective = self.findPreferredElective(e,currentStudent)
     			
+    			#Check if the requested elective has vacant seats 
     			if not(isElectiveFull(preferrefElective)):
 
     				self.allocation[preferrefElective][currentStudent] = 1
