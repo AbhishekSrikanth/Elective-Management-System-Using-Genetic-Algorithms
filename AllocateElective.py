@@ -57,11 +57,12 @@ class AllocateElective:
 
 
             #self.store_avg_fitness()
-            #self.store_top_alloc()
             #print(self.population)
             #numpy.savetxt("Z:\EAinPY\pypops" + str(gen+1) + ".txt",numpy.array(self.population),fmt='%1.1d',delimiter = ' ',newline = '\n')
             
             self.currentGeneration += 1
+
+        self.storeBestAllocation()
 
 		#TO-DO
 		#-Support functions
@@ -155,6 +156,21 @@ class AllocateElective:
         else :
 
             return True
+
+
+    #Store Best Allocation
+    def storeBestAllocation(self):
+
+    	#Create empty chromosome
+        self.bestChromosome = [0 for ti in  range(self.totalStudents)]
+        #Get the best chromosome from the population
+        self.bestChromosome = [self.population[0][i] for i in range(self.totalStudents)]
+        #Get the allocation for the best chromosome
+        self.allocate(self.bestChromosome)
+        #Get the fitness score
+        self.bestFitnessScore = self.calculateFitness(self.allocation)
+        #Save it to CSV file
+        numpy.savetxt(configs.data_dir + "BestAllocation.csv",numpy.array(self.allocation), delimiter = ',', newline = '\n')
 
 
     #Loads best chromosomes which are the parents for the next generation.
