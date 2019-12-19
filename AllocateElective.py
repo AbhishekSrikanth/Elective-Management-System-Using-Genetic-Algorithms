@@ -64,12 +64,6 @@ class AllocateElective:
 
         self.storeBestAllocation()
 
-		#TO-DO
-		#-Support functions
-		#-Write code for rest of the generations 
-		#-Add mutation functions
-		#-Add cross-over functions
-
 
 	#Calculates fitness for current allocation
 	def calculateFitness(self):
