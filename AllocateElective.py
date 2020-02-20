@@ -16,7 +16,7 @@ class AllocateElective:
         # Strength of each Elective (list)
         self.class_strengths = configs.class_strengths
         # Number of generations the algorithm will perform
-        self.generations = configs.generations
+        self.generations = configs.numberofGenerations
         # Size of the population per generation
         self.population_cap = configs.population_cap
 
@@ -26,6 +26,8 @@ class AllocateElective:
         # Creating a list with values from 0 to (Number of Students - 1), each
         # representing a student
         self.chromosome = [int(i) for i in range(0, self.totalStudents)]
+
+        self.population = [[0 for x in range(self.totalStudents)] for y in range(self.population_cap)]
 
         for i in range(0, self.population_cap):
 
