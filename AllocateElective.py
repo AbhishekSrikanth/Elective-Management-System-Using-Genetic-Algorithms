@@ -8,7 +8,7 @@ class AllocateElective:
     def __init__(self):
 
         # Read elective preferences from CSV file and store in numpy array
-        self.preferences = pd.read_csv(configs.preferences_file).values
+        self.preferences = pd.read_csv(configs.preferences_file, header=None).values
 
         # Getting specifications from the configs file
         self.totalStudents = configs.totalStudents  # Total number of students
@@ -40,7 +40,7 @@ class AllocateElective:
             self.allocate(self.chromosome)
 
             # Get Fitness for the allocation
-            self.fitnessScore = self.calculateFitness(self.allocation)
+            self.fitnessScore = self.calculateFitness()
 
             # Store the fitness score along with the corresponding chromosome
             self.population[i][self.totalStudents] = self.fitnessScore
@@ -132,6 +132,8 @@ class AllocateElective:
         # Empty preference table
         studentPreference = [
             [0 for i in range(2)] for j in range(self.numberofElectives)]
+
+        print(len(self.preferences))
 
         for pfi in range(self.numberofElectives):
 
