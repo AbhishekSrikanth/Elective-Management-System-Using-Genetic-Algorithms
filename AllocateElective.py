@@ -27,7 +27,7 @@ class AllocateElective:
         # representing a student
         self.chromosome = [int(i) for i in range(0, self.totalStudents)]
 
-        self.population = [[0 for x in range(self.totalStudents)] for y in range(self.population_cap)]
+        self.population = [[0 for x in range(self.totalStudents+1)] for y in range(self.population_cap)]
 
         for i in range(0, self.population_cap):
 
@@ -53,7 +53,7 @@ class AllocateElective:
             # print("GEN : " + str(gen+1))
 
             # Get parents from previous generation
-            self.__parentloader()
+            self.__parentLoader()
 
             # Perform PMX cross-over
             self.__PMX()
