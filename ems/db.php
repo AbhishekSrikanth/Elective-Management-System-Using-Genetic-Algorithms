@@ -238,6 +238,10 @@
 			{
 				require 'export.php';
 			}
+			else if($p=='import')
+			{
+				require 'import.php';
+			}
 			
 		}
 		else
@@ -382,13 +386,167 @@
 	//EXPORT
 	if(isset($_POST['export']))
 	{
+		if(!empty($_SESSION['uid']))
+		{
 		//$v=$_POST['check'];
 		
-				$sql = "SELECT * FROM preference INTO OUTFILE 'C:\xampp\htdocs\ems\data\preferences'
-				FIELDS ENCLOSED BY '"' TERMINATED BY ';' ESCAPED BY '"' LINES TERMINATED BY '\r\n';";
-				$res = mysqli_query($con,$sql);		
+				//$sql = "SELECT * FROM preference INTO OUTFILE 'C:\xampp\htdocs\ems\data\preferences'
+				//FIELDS ENCLOSED BY '"' TERMINATED BY ';' ESCAPED BY '"' LINES TERMINATED BY '\r\n';";
+				//$res = mysqli_query($con,$sql);
+			/*
+				// database record to be exported
+				$db_record = 'preference';
+				// optional where query
+				//$where = 'WHERE 1 ORDER BY 1';
+				// filename for export
+				$csv_filename = 'preference.csv';
 		
+				
+				$csv_export = '';
+
+				// query to get data from database
+				$query = mysqli_query($con, "SELECT * FROM ".$db_record);
+				$field = mysqli_field_count($con);
+
+				// create line with field names
+				for($i = 0; $i < $field; $i++) {
+					$csv_export.= mysqli_fetch_field_direct($query, $i)->name.';';
+				}
+
+				// newline (seems to work both on Linux & Windows servers)
+				$csv_export.= '
+				';
+
+				// loop through database query and fill export variable
+				while($row = mysqli_fetch_array($query)) {
+					// create line with field values
+					for($i = 0; $i < $field; $i++) {
+						$csv_export.= '"'.$row[mysqli_fetch_field_direct($query, $i)->name].'";';
+					}
+					$csv_export.= '
+				';
+				}
+				echo $csv_export;
+				$fp = fopen("preference.csv", 'w');
+				fputcsv($fp,$csv_export);
+				fclose($fp);
+				// Export the data and prompt a csv file for download
+				//header("Content-type: text/x-csv");
+				//header("Content-Disposition: attachment; filename=".$csv_filename."");
+				//echo($csv_export);
+			*/
+				//get records from database
+				$query = $con->query("SELECT * FROM preference");
+
+				if($query->num_rows > 0)
+				{
+					$delimiter = ",";
+					$filename = "preference.csv";
+					
+					//create a file pointer
+					//$f = fopen('php://memory', 'w');
+					$f = fopen('preference.csv', 'w');
+					
+					//set column headers
+					$fields = array('SID', 'Pref1', 'Pref2', 'Pref3', 'Pref4', 'Pref5');
+					fputcsv($f, $fields, $delimiter);
+					
+					//output each row of the data, format line as csv and write to file pointer
+					while($row = $query->fetch_assoc()){
+						//$status = ($row['status'] == '1')?'Active':'Inactive';
+						$lineData = array($row['SID'], $row['Pref1'], $row['Pref2'], $row['Pref3'], $row['Pref4'], $row['Pref5']);
+						//fputcsv($f, $lineData, $delimiter);
+						fputcsv($f, $lineData, $delimiter);
+					}
+					
+					//move back to beginning of file
+					fseek($f, 0);
+					//set headers to download file rather than displayed
+					header('Content-Type: text/csv');
+					header('Content-Disposition: attachment; filename="' . $filename . '";');
+					
+					
+					//output all remaining data on a file pointer
+					fpassthru($f);
+			
 			require 'export.php'; 
+				}
+		}
+		else
+		{
+			require'login.php';
+		}
+	}
+	
+	//IMPORT
+
+	if(isset($_POST['importSubmit']))
+	{
+		if(!empty($_SESSION['uid']))
+		{
+		
+		// Allowed mime types
+		$csvMimes = array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel', 'text/plain');
+		
+		// Validate whether selected file is a CSV file
+		if(!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'], $csvMimes)){
+			
+			// If the file is uploaded
+			if(is_uploaded_file($_FILES['file']['tmp_name'])){
+				
+				// Open uploaded CSV file with read-only mode
+				$csvFile = fopen($_FILES['file']['tmp_name'], 'r');
+				
+				// Skip the first line
+				fgetcsv($csvFile);
+				
+				// Parse data from CSV file line by line
+				while(($line = fgetcsv($csvFile)) !== FALSE){
+					// Get row data
+					$sid  = $line[0];
+					$cid  = $line[1];
+					
+					// Check whether member already exists in the database with the same email
+					
+						// Insert member data in the database
+						//$con->query("INSERT INTO allocated (SID, CID) VALUES ('$sid', '$cid');");
+						
+						// Check whether member already exists in the database with the same email
+					$prevQuery = "SELECT SID FROM allocated1 WHERE SID = '".$line[0]."'";
+					$prevResult = $con->query($prevQuery);
+					
+					if($prevResult->num_rows > 0){
+						// Update member data in the database
+						$con->query("UPDATE allocated1 SET SID = '".$sid."', CID = '".$cid."' WHERE SID = '".$sid."'");
+					}else{
+						// Insert member data in the database
+						$con->query("INSERT INTO allocated1 (SID, CID) VALUES ('".$sid."', '".$cid."');");
+					}
+				
+					
+				}
+				
+				// Close opened CSV file
+				fclose($csvFile);
+				
+				$qstring = '?status=succ';
+			}else{
+				$qstring = '?status=err';
+			}
+		}else{
+			$qstring = '?status=invalid_file';
+		}
+		
+
+
+		}
+		// Redirect to the listing page
+		header("Location: import.php".$qstring);
+		//else
+		//{
+			//require'login.php';
+		//}
 	}
 
+	
 	
