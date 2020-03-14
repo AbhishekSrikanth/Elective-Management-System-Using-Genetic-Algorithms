@@ -53,6 +53,7 @@
                 <!--<li><a href="db.php?page=index"><i class="fa fa-fw fa-home"></i>Home<i class="pull-right"></i></a></li>-->
                 <li><a href="db.php?page=profile"><i class="fa fa-fw fa-user"></i>My Profile</a></li>
 				<li><a href="db.php?page=feedbackreport"><i class="fa fa-fw fa-paper-plane-o"></i>Feedback Report</a></li>
+				<li><a href="db.php?page=export"><i class="fa fa-fw fa-paper-plane-o"></i>Export</a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->

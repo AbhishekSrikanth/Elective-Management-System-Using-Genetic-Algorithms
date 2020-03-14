@@ -234,6 +234,10 @@
 			{
 				require 'preference.php';
 			}
+			else if($p=='export')
+			{
+				require 'export.php';
+			}
 			
 		}
 		else
@@ -318,8 +322,8 @@
 			echo $p1;
 			
 			$sql="INSERT INTO preference(SID,Pref1,Pref2,Pref3,Pref4,Pref5) values('$uid','$p1','$p2','$p3','$p4','$p5')";
-			$sql1="ALTER TABLE preference ADD $cid int;";
-			$res1=mysqli_query($con,$sql1);
+			//$sql1="ALTER TABLE preference ADD $cid int;";
+			$res=mysqli_query($con,$sql);
 			
 		
 			//echo $uid;
@@ -373,6 +377,18 @@
 		{
 			require'login.php';
 		}
+	}//C:\xampp\htdocs\ems\data
+	
+	//EXPORT
+	if(isset($_POST['export']))
+	{
+		//$v=$_POST['check'];
+		
+				$sql = "SELECT * FROM preference INTO OUTFILE 'C:\xampp\htdocs\ems\data\preferences'
+				FIELDS ENCLOSED BY '"' TERMINATED BY ';' ESCAPED BY '"' LINES TERMINATED BY '\r\n';";
+				$res = mysqli_query($con,$sql);		
+		
+			require 'export.php'; 
 	}
 
 	
