@@ -7,6 +7,9 @@ class AllocateElective:
 
     def __init__(self):
 
+        self.totalStudents = 0
+        self.numberofElectives = 0
+
         # Format input from web-app
         self.__formatPreferences()
 
@@ -14,15 +17,13 @@ class AllocateElective:
         self.preferences = pd.read_csv(
             configs.preferences_file, header=None).values
 
-        # Getting specifications from the configs file
-        self.totalStudents = configs.totalStudents  # Total number of students
-        self.numberofElectives = configs.numberofElectives  # Number of Electives
         # Strength of each Elective (list)
-        self.class_strengths = configs.class_strengths
+        class_size_df = pd.read_csv(configs.data_dir + 'max.csv')
+        self.class_strengths = list(class_size_df.values)
         # Number of generations the algorithm will perform
-        self.generations = configs.numberofGenerations
+        self.generations = 100
         # Size of the population per generation
-        self.population_cap = configs.population_cap
+        self.population_cap = 10
 
         # Creating the first generation population
 
@@ -83,26 +84,17 @@ class AllocateElective:
         self.storeBestAllocation()
 
         # Formats output for web-app
-        # self.__formatAllocation()
+        self.__formatAllocation()
 
     # Calculates fitness for current allocation
     def calculateFitness(self):
 
         # Initialize score
         fitnessScore = 0
-        # List to score allocation details
-        self.fitnessDetails = [0 for l1 in range(5)]
 
         for l1 in range(self.numberofElectives):
 
             for l2 in range(self.totalStudents):
-
-                # Store allocation details
-                # Each index stores how much students have been given electives as per their preferences
-                # For Example: Index 1 may contain how many students were given their most preferred course
-                # and so on ...
-                self.fitnessDetails[
-                    int(self.preferences[l1][l2])] += int(self.allocation[l1][l2])
 
                 # Calculate fitness score
                 # Score calculated by a reward mechanism where the algorithm is given a high score
@@ -288,24 +280,25 @@ class AllocateElective:
 
         prefValues = prefValues.T
 
-        (noOfElective, noOfStudents) = prefValues.shape
+        (self.numberofElectives, self.totalStudents) = prefValues.shape
 
-        np.savetxt(configs.data_dir + "test.csv",
+        np.savetxt(configs.data_dir + "preferences.csv",
                    np.array(prefValues).astype(int), delimiter=',', newline='\n', fmt='%i')
 
     def __formatAllocation(self):
 
         alloc_from_algo = pd.read_csv(
-            configs.data_dir + 'allocation.csv', header=None)
+            configs.data_dir + 'allocations.csv', header=None)
 
         pref_from_web = pd.read_csv(
             configs.data_dir + 'preferences_from_web.csv')
 
         alloc_to_web = pd.DataFrame()
         alloc_to_web['SID'] = pref_from_web['SID'].values
-        alloc_to_web['CID'] = [list(i).index(1) + 1 for i in alloc_from_algo.values.T]
+        alloc_to_web['CID'] = [list(i).index(
+            1) + 1 for i in alloc_from_algo.values.T]
 
-        alloc_to_web.to_csv('test_alloc.csv')
+        alloc_to_web.to_csv(configs.data_dir + 'alloc_to_web.csv', index=False)
 
 
 if __name__ == '__main__':
