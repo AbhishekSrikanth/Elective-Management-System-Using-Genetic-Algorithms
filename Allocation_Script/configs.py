@@ -5,8 +5,8 @@ allocations_file = "data/allocations.csv"
 
 # Specifications
 totalStudents = 20
-numberofElectives = 5
-class_strengths = [5, 5, 5, 5, 5]
+numberofElectives = 4
+class_strengths = [5, 5, 5, 5]
 
 # Algorithm Parameters
 numberofGenerations = 10

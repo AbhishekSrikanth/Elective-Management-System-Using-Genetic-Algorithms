@@ -48,6 +48,8 @@ class AllocateElective:
             # Randomly shuffle the chromosome to create rest of the population
             np.random.shuffle(self.chromosome)
 
+        self.currentGeneration = 0
+
         for g in range(self.generations):
 
             # print("GEN : " + str(gen+1))
@@ -56,7 +58,7 @@ class AllocateElective:
             self.__parentLoader()
 
             # Perform PMX cross-over
-            self.__PMX()
+            self.__Cycx()
 
             # Create rest of the population by mutating the child-chromosomes of
             # selected parents after cross-over
@@ -123,7 +125,7 @@ class AllocateElective:
                 # Check if the requested elective has vacant seats
                 if not(self.isElectiveFull(preferrefElective)):
 
-                    self.allocation[preferrefElective][currentStudent] = 1
+                    self.allocation[preferrefElective][currentStudent] = int(1)
                     break
 
     # Returns nth preferred course of a student
@@ -133,7 +135,7 @@ class AllocateElective:
         studentPreference = [
             [0 for i in range(2)] for j in range(self.numberofElectives)]
 
-        print(len(self.preferences))
+        # print(len(self.preferences))
 
         for pfi in range(self.numberofElectives):
 
@@ -176,10 +178,10 @@ class AllocateElective:
         # Get the allocation for the best chromosome
         self.allocate(self.bestChromosome)
         # Get the fitness score
-        self.bestFitnessScore = self.calculateFitness(self.allocation)
+        self.bestFitnessScore = self.calculateFitness()
         # Save it to CSV file
         np.savetxt(configs.data_dir + "BestAllocation.csv",
-                   np.array(self.allocation), delimiter=',', newline='\n')
+                   np.array(self.allocation).astype(int), delimiter=',', newline='\n', fmt='%i')
 
     # Loads best chromosomes which are the parents for the next generation.
     def __parentLoader(self):
@@ -193,7 +195,7 @@ class AllocateElective:
     # Creates population by mutating two child-chromosomes
     def __populateNextGeneration2(self):
 
-        for i in range(self.population_cap / 2):
+        for i in range(int(self.population_cap / 2)):
 
             for j in range(self.totalStudents):
 
@@ -201,11 +203,11 @@ class AllocateElective:
                 self.population[i + 5][j] = self.child2[j]
 
             self.allocate(self.child1)
-            self.fitnessScore = self.calculateFitness(self.allocation)
+            self.fitnessScore = self.calculateFitness()
             self.population[i][self.totalStudents] = self.fitnessScore
 
             self.allocate(self.child2)
-            self.fitnessScore = self.calculateFitness(self.allocation)
+            self.fitnessScore = self.calculateFitness()
             self.population[i + 5][self.totalStudents] = self.fitnessScore
 
             self.__insertMutation(self.child1)  # Using insert-mutation
@@ -230,11 +232,47 @@ class AllocateElective:
         else:
             return pmxy
 
+    # Cyclic Cross-over
+    def __Cycx(self):
+
+        z = [-1 for i in range(self.totalStudents)]
+        self.child1 = [-1 for i in range(self.totalStudents)]
+        self.child2 = [-1 for i in range(self.totalStudents)]
+        cycflag = 1
+
+        for i in range(self.totalStudents):
+
+            if z[i] == -1:
+
+                s1 = i
+
+                while (z[s1] != cycflag):
+
+                    z[s1] = cycflag
+
+                    sv = self.parent2[s1]
+
+                    s1 = self.parent1.index(sv)
+
+                cycflag += 1
+
+        for i in range(self.totalStudents):
+
+            if (z[i] % 2 == 1):
+
+                self.child1[i] = self.parent1[i]
+                self.child2[i] = self.parent2[i]
+
+            else:
+
+                self.child1[i] = self.parent2[i]
+                self.child2[i] = self.parent1[i]
+
     # PMX Cross-over
     def __PMX(self):
 
         pmxl = np.random.randint(self.totalStudents)
-        pmxu = 40  # Have To find what this is ...
+        pmxu = self.totalStudents  # Have To find what this is ...
         self.child1 = [-1 for i in range(self.totalStudents)]
         self.child2 = [-1 for i in range(self.totalStudents)]
 
@@ -287,3 +325,6 @@ class AllocateElective:
         for pmxi in range(self.totalStudents):
             if(self.child2[pmxi] == -1):
                 self.child2[pmxi] = self.parent1[pmxi]
+
+if __name__ == '__main__':
+    ae = AllocateElective()
