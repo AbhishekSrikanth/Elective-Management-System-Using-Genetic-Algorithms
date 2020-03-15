@@ -9,5 +9,5 @@ numberofElectives = 5
 class_strengths = [5, 5, 5, 5, 5]
 
 # Algorithm Parameters
-numberofGenerations = 10
+numberofGenerations = 20
 population_cap = 10
