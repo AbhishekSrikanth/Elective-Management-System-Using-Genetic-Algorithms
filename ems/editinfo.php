@@ -42,7 +42,7 @@ $uid=$_SESSION['uid'];
   margin-top:100px;
 }
 .custom1{
-  margin-top:50px;
+  margin-top:30px;
 }
 </style>
 <title>Profile</title>
@@ -59,35 +59,43 @@ $uid=$_SESSION['uid'];
   <p><?php// echo $email;?></p>-->
   <div class="profile-userbuttons ">
 					<form action="db.php" method="post" enctype="multipart/form-data">
-						<input class ="col-md-offset-4" type="file" name="p_img" accept="image/*">
-						<input type="submit" name="upload" value="Upload" class="btn btn-success">
+						<input class ="col-md-offset-4" type="file" name="p_img" accept="image/*" disabled>
+						<input type="submit" name="upload" value="Upload" class="btn btn-success" disabled>
 					</form>
   </div>
   <div class="profile-usermenu text-center">
+				<form action="db.php" method="post">
+					
 					<ul class="nav">
 						
-						<li>
-							<h4 >
+						<li class="form-group">
+							<label>
 							<i class="glyphicon glyphicon-user"></i>
-							 <?php echo $name;?></h4>
+							Name : </label>
+							<input type="text" class="form-control" name="name" value="<?php echo $name;?>">
 						</li>
-						<li>
-							<h4>
+						<hr>
+						<li class="form-group">
+							<label>
 							<i class="glyphicon glyphicon-phone"></i>
-							 <?php echo $mobile;?> </h4>
+							 Mobile :  </label>
+							 <input type="text" class="form-control" name="mobile" value="<?php echo $mobile;?>">
 						</li>
-						<li>
-							<h4>
+						<hr>
+						<li class="form-group">
+							<label>
 							<i class="glyphicon glyphicon-envelope"></i>
-							 <?php echo $email;?> </h4>
+							 Email : </label>
+							<input type="text" class="form-control" name="email" value="<?php echo $email;?>">
 						</li>
-						<li><a href="db.php?edit"><button type="button" name='edit_info'  class="btn btn-success btn-sm">Edit Info</button></li>
+						<li><input type="submit" class="btn btn-info" name="update" value="Update"></li>
 					</ul>
+				</form>
 	</div>
   
-  <a href="twitter.com"><i class="fa fa-twitter"></i></a>
+  <!--<a href="twitter.com"><i class="fa fa-twitter"></i></a>
   <a href="linkedin.com"><i class="fa fa-linkedin"></i></a>
-  <a href="fb.com"><i class="fa fa-facebook"></i></a>
+  <a href="fb.com"><i class="fa fa-facebook"></i></a>-->
   
   </div>
 </body>

@@ -1,8 +1,8 @@
 <?php 
 	
-	$r=$_SESSION['r'];
+	$r='student';
 
-	
+	$con=mysqli_connect('localhost','root','','ems');
 		include 'userheader.php';
 	
 	$sql1="SELECT * FROM course";	#WHERE CID='$id' ";
@@ -18,13 +18,24 @@
 		{
 			$cc = $cc +1;
 		} 						
-
+	$msg="";
+	
+	if(isset($_GET['mas']))
+	{
+		$msg = $_GET['mas'];
+	}
 					
 ?>
 <div class="container jumbotron " >
 <div class="form-group col-md-6 col-md-offset-3 vert-offset-top-3 vert-offset-bottom-3">
 				<h3 class="text-center"><strong>Select your Preference</strong></h3>
-			</div>
+	<?php if(!empty($msg)){ ?>
+	<div class="col-xs-12">
+		<div class="alert alert-danger"><?php echo $msg; ?></div>
+	</div>
+	<?php } ?>		
+</div>
+
 <form  class="" action="db.php?cc=<?php echo $cc; ?>&submit" method="post">
 			<?php
 					foreach($res1 as $row)
@@ -32,6 +43,7 @@
 						
 							$cid=$row['CID'];
 							$cname=$row['Cname'];
+							$max=$row['Max'];
 							$c='c';
 							//$co = chr($count);
 							
@@ -54,26 +66,32 @@
 							{
 								$cname1 = $cname;
 								$cid1 = $cid;
+								$max1 = $max;
 							}
 							if($count==2 and $count<=$cc)
 							{
 								$cname2 = $cname;
 								$cid2 = $cid;
+								$max2 = $max;
+								
 							}
 							if($count==3 and $count<=$cc)
 							{
 								$cname3 = $cname;
 								$cid3 = $cid;
+								$max3 = $max;
 							}
 							if($count==4 and $count<=$cc)
 							{
 								$cname4 = $cname;
 								$cid4 = $cid;
+								$max4 = $max;
 							}
 							if($count==5 and $count<=$cc)
 							{
 								$cname5 = $cname;
 								$cid5 = $cid;
+								$max5 = $max;
 							}
 				$count = $count +1;	
 					}				
@@ -83,8 +101,10 @@
 			if(!empty($cid1))
 			{?>
 			<div class="form-group col-md-6 col-md-offset-3">
+				
 				<label ><?php echo $cname1; ?></label>
-				<label ><?php echo $cc ?></label>
+				<label  class="text-primary"> Total Seats : <?php echo $max1 ?></label>
+				
 				<input type="text"  class="form-control " name='cname1'>
 			</div>
 			
@@ -99,7 +119,7 @@
 			{?>
 			<div class="form-group col-md-6 col-md-offset-3">
 				<label ><?php echo $cname2; ?></label>
-				
+				<label  class="text-primary"> Total Seats : <?php echo $max2 ?></label>
 				<input type="text"  class="form-control " name='cname2'>
 			</div>
 			
@@ -114,7 +134,7 @@
 			{?>
 			<div class="form-group col-md-6 col-md-offset-3">
 				<label ><?php echo $cname3; ?></label>
-				
+				<label  class="text-primary"> Total Seats : <?php echo $max3 ?></label>
 				<input type="text"  class="form-control " name='cname3'>
 			</div>
 			
@@ -129,7 +149,7 @@
 			{?>
 			<div class="form-group col-md-6 col-md-offset-3">
 				<label ><?php echo $cname4; ?></label>
-				
+				<label  class="text-primary"> Total Seats : <?php echo $max4 ?></label>
 				<input type="text"  class="form-control " name='cname4'>
 			</div>
 			
@@ -144,7 +164,7 @@
 			{?>
 			<div class="form-group col-md-6 col-md-offset-3">
 				<label ><?php echo $cname5; ?></label>
-				
+				<label  class="text-primary"> Total Seats : <?php echo $max5 ?></label>
 				<input type="text"  class="form-control " name='cname5'>
 			</div>
 			

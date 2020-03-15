@@ -48,6 +48,11 @@ if($r=='prof')
 				<textarea id="textarea" name="text_area" class="form-control" rows="6"></textarea>
 			</div>
 			
+			<div class="form-group col-md-6 col-md-offset-3">
+				<label>Maximum Capacity :</label>
+				<input type="text"  class="form-control" name="max">
+			</div>
+			
 			<div class="form-group col-md-3 col-md-offset-5">
 				<input type="submit" name="gen_it" class="btn btn-info" value="Add Course Preference">
 			</div>

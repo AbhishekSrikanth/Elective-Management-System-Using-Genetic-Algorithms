@@ -180,22 +180,7 @@
 	}
 		newlogin($_POST['email'],$_POST['pwd']);
 	}
-	elseif(isset($_GET['edit']))
-	{
-		require 'edit.php';
-	}
-	else if(isset($_POST['update']))
-	{
-		$email = $_POST['email'];
-		$name = $_POST['name'];
-		$mobile = $_POST['mobile'];
-		
-		
-		$sql="UPDATE Emp_Details SET Name='$name', Email='$email' ,Mobile='$mobile' where ID=".$_SESSION['uid']."";
-		$res=mysqli_query($con,$sql);
-			
-			require 'profile.php';
-	}
+	
 	elseif(isset($_GET['logout']))
 	{
 		session_unset();
@@ -285,22 +270,67 @@
 			
 			
 					$c_head=$_POST['c_head'];
-					
+					$max=$_POST['max'];
 					$text_area=$_POST['text_area'];
 					
-					$sql="INSERT INTO course(Cname,Cdetails) values('$c_head','$text_area');";
+					$sql="INSERT INTO course(Cname,Cdetails,Max) values('$c_head','$text_area','$max');";
 				    $res=mysqli_query($con,$sql);
 					
-					$sql="SELECT CID from course where Cname = '.$c_head.';";
-				    $res=mysqli_query($con,$sql);
-					$row=mysqli_fetch_array($res);
-					$cid=$row['CID'];
-					$cid = 4;
-					echo $cid;
-					$sql1="ALTER TABLE preference ADD $cid int;";
-					$res1=mysqli_query($con,$sql1);
-					echo $res1;
-				   // require 'gencourse.php';
+					$u='dd';
+					
+					
+					$sql="SELECT count(CID) AS cr from course;";
+					$res=mysqli_query($con,$sql);
+					$row=mysqli_fetch_assoc($res);
+					$c=$row['cr'];
+					
+				    //$res=mysqli_query($con,$sql);
+					//echo $row;
+					
+					//echo $c;
+					//$row = mysql_fetch_array($res);
+					//$c=$row['c'];
+					if($c==1)
+					{
+						$sql1="ALTER TABLE preference ADD Elec1 int;";
+						$res1=mysqli_query($con,$sql1);
+						require 'gencourse.php';
+					}
+					
+					if($c==2)
+					{
+						$sql1="ALTER TABLE preference ADD Elec2 int;";
+						$res1=mysqli_query($con,$sql1);
+						require 'gencourse.php';
+					}
+					if($c==3)
+					{
+						$sql1="ALTER TABLE preference ADD Elec3 int;";
+						$res1=mysqli_query($con,$sql1);
+						require 'gencourse.php';
+					}
+					if($c==4)
+					{
+						$sql1="ALTER TABLE preference ADD Elec4 int;";
+						$res1=mysqli_query($con,$sql1);
+						require 'gencourse.php';
+					}
+					if($c==5)
+					{
+						$sql1="ALTER TABLE preference ADD Elec5 int;";
+						$res1=mysqli_query($con,$sql1);
+						require 'gencourse.php';
+					}
+					
+					
+					
+					
+					//$cid = 4;
+					//echo $cid;
+					//$sql1="ALTER TABLE preference ADD $cid int;";
+					//$res1=mysqli_query($con,$sql1);
+					//echo $res1;
+				    //require 'gencourse.php';
 				
 		}
 		else
@@ -309,73 +339,96 @@
 		}
 	}
 	
+	/* EDIT INFO */
+	elseif(isset($_GET['edit']))
+	{
+		require 'editinfo.php';
+	}
+	
+	/* UPDATE INFO */
+	else if(isset($_POST['update']))
+	{
+		$email = $_POST['email'];
+		$name = $_POST['name'];
+		$mobile = $_POST['mobile'];
+		
+		
+		$sql="UPDATE main SET Name='$name', Email='$email' ,Mobile='$mobile' where ID=".$_SESSION['uid']."";
+		$res=mysqli_query($con,$sql);
+			
+			require 'profile.php';
+	}
+	
+	/*UPLOADING PROFILE PICTURE*/
+	if(isset($_POST['upload']))
+	{
+		$id=$_SESSION['uid'];
+		if(!empty($id))
+		{
+			$targetfile="img/".basename($_FILES["p_img"]["name"]);
+			$imageFileType = strtolower(pathinfo($targetfile,PATHINFO_EXTENSION));
+			
+			$sql = "UPDATE main SET image='$targetfile' WHERE ID=".$_SESSION['uid']."";
+			$res=mysqli_query($con,$sql);
+			move_uploaded_file($_FILES["p_img"]["tmp_name"],$targetfile);
+			require 'profile.php';
+		}
+		else
+		{
+			require 'login.php';
+		}
+	}
+	
 	/*SUBMIT PREFERENCES*/
 	if(isset($_POST['submit_pref']))
 	{
 		if(!empty($_SESSION['uid']))
 		{
-			//$cc = $_GET['cc'];
+			$cc = $_GET['cc'];
 			$uid = $_SESSION['uid'];
-			var_dump($_POST);
+			//var_dump($_POST);
 			
 			$p1 = $_POST['cname1'];
 			$p2 = $_POST['cname2'];
 			$p3 = $_POST['cname3'];
 			$p4 = $_POST['cname4'];
 			$p5 = $_POST['cname5'];
-			echo $p1;
-			
-			$sql="INSERT INTO preference(SID,Pref1,Pref2,Pref3,Pref4,Pref5) values('$uid','$p1','$p2','$p3','$p4','$p5')";
-			//$sql1="ALTER TABLE preference ADD $cid int;";
-			$res=mysqli_query($con,$sql);
-			
-		
-			//echo $uid;
-			
-			/*
-			if(!empty($_POST['1']))
+			if($p1!=$p2 and $p1!=$p3 and $p1!=$p4 and $p1!=$p5 and $p1!=$p3 and $p2!=$p3 and $p2!=$p4 and $p2!=$p5 and $p3!=$p4 and $p3 != $p5 and $p4 != $p5 and $p1!=0 and $p2!=0 and $p3!=0 and $p4!=0 and $p5!=0  )
 			{
-				$p1 = $_POST['1'];
-				echo $p1;
-				$sql="INSERT INTO preference(Pref1) values('$p1')";
-				
-			}
-			if(!empty($_POST['2']))
+			if($cc==2)
 			{
-				$p2 = $_POST['2'];
-				$sql="INSERT INTO preference(Pref2) values('$p2')";
-				
-			}
-			if(!empty($_POST['3']))
-			{
-				$p3 = $_POST['3'];
-				$sql="INSERT INTO preference(Pref3) values('$p3')";
-				
-			}
-			if(!empty($_POST['4']))
-			{
-				$p4 = $_POST['4'];
-				$sql="INSERT INTO preference(Pref4) values('$p4')";
-				
-			}
-			if(!empty($_POST['5']))
-			{
-				$p5 = $_POST['5'];
-				$sql="INSERT INTO preference(Pref5) values('$p5')";
-				
-			}*/
-			//for ($x = 0; $x <= $cc; $x++) {
-			//	$sql="INSERT INTO preference(SID) values('$uid');
- 
-			//		$c_head=$_POST['1'];
+				$sql="INSERT INTO preference(SID,Elec1,Elec2) values('$uid','$p1','$p2')";
+				$res=mysqli_query($con,$sql);
 					
-			//		$text_area=$_POST['2'];
+			}
+			if($cc==3)
+			{
+				$sql="INSERT INTO preference(SID,Elec1,Elec2,Elec3) values('$uid','$p1','$p2','$p3')";
+				$res=mysqli_query($con,$sql);
 					
-					//$sql="INSERT INTO course(Cname,Cdetails) values('$c_head','$text_area');";
-				    //$res=mysqli_query($con,$sql);
+			}
+			if($cc==4)
+			{
+				$sql="INSERT INTO preference(SID,Elec1,Elec2,Elec3,Elec4) values('$uid','$p1','$p2','$p3','$p4')";
+				$res=mysqli_query($con,$sql);
+					
+			}
+			if($cc==5)
+			{
+				$sql="INSERT INTO preference(SID,Elec1,Elec2,Elec3,Elec4,ELec5) values('$uid','$p1','$p2','$p3','$p4','$p5')";
+				$res=mysqli_query($con,$sql);
+					
+			}
+			
+			
 				 
-				 //  require 'course_history.php';
-				
+				  require 'course_history.php';
+			}
+			else
+			{
+				header('Location:http://localhost/ems/preference.php?mas=Enter Unique value for each preference');
+			}
+			
 		}
 		else
 		{
@@ -388,53 +441,7 @@
 	{
 		if(!empty($_SESSION['uid']))
 		{
-		//$v=$_POST['check'];
 		
-				//$sql = "SELECT * FROM preference INTO OUTFILE 'C:\xampp\htdocs\ems\data\preferences'
-				//FIELDS ENCLOSED BY '"' TERMINATED BY ';' ESCAPED BY '"' LINES TERMINATED BY '\r\n';";
-				//$res = mysqli_query($con,$sql);
-			/*
-				// database record to be exported
-				$db_record = 'preference';
-				// optional where query
-				//$where = 'WHERE 1 ORDER BY 1';
-				// filename for export
-				$csv_filename = 'preference.csv';
-		
-				
-				$csv_export = '';
-
-				// query to get data from database
-				$query = mysqli_query($con, "SELECT * FROM ".$db_record);
-				$field = mysqli_field_count($con);
-
-				// create line with field names
-				for($i = 0; $i < $field; $i++) {
-					$csv_export.= mysqli_fetch_field_direct($query, $i)->name.';';
-				}
-
-				// newline (seems to work both on Linux & Windows servers)
-				$csv_export.= '
-				';
-
-				// loop through database query and fill export variable
-				while($row = mysqli_fetch_array($query)) {
-					// create line with field values
-					for($i = 0; $i < $field; $i++) {
-						$csv_export.= '"'.$row[mysqli_fetch_field_direct($query, $i)->name].'";';
-					}
-					$csv_export.= '
-				';
-				}
-				echo $csv_export;
-				$fp = fopen("preference.csv", 'w');
-				fputcsv($fp,$csv_export);
-				fclose($fp);
-				// Export the data and prompt a csv file for download
-				//header("Content-type: text/x-csv");
-				//header("Content-Disposition: attachment; filename=".$csv_filename."");
-				//echo($csv_export);
-			*/
 				//get records from database
 				$query = $con->query("SELECT * FROM preference");
 
@@ -448,13 +455,13 @@
 					$f = fopen('preference.csv', 'w');
 					
 					//set column headers
-					$fields = array('SID', 'Pref1', 'Pref2', 'Pref3', 'Pref4', 'Pref5');
+					$fields = array('SID', 'Elec1', 'Elec2', 'Elec3', 'Elec4', 'Elec5');
 					fputcsv($f, $fields, $delimiter);
 					
 					//output each row of the data, format line as csv and write to file pointer
 					while($row = $query->fetch_assoc()){
 						//$status = ($row['status'] == '1')?'Active':'Inactive';
-						$lineData = array($row['SID'], $row['Pref1'], $row['Pref2'], $row['Pref3'], $row['Pref4'], $row['Pref5']);
+						$lineData = array($row['SID'], $row['Elec1'], $row['Elec2'], $row['Elec3'], $row['Elec4'], $row['Elec5']);
 						//fputcsv($f, $lineData, $delimiter);
 						fputcsv($f, $lineData, $delimiter);
 					}
@@ -547,6 +554,63 @@
 			//require'login.php';
 		//}
 	}
+	
+	if(isset($_POST['cally']))
+	{
+		exec("allocateelective.py");
+		require 'import.php';
+	}
+	
+	
+	//MAX SIZE
+	if(isset($_POST['export_max']))
+	{
+		if(!empty($_SESSION['uid']))
+		{
+		
+				//get records from database
+				$query = $con->query("SELECT Max FROM course");
+
+				if($query->num_rows > 0)
+				{
+					$delimiter = ",";
+					$filename = "max.csv";
+					
+					//create a file pointer
+					//$f = fopen('php://memory', 'w');
+					$f = fopen('max.csv', 'w');
+					
+					//set column headers
+					$fields = array('Max');
+					fputcsv($f, $fields, $delimiter);
+					
+					//output each row of the data, format line as csv and write to file pointer
+					while($row = $query->fetch_assoc()){
+						
+						$lineData = array($row['Max']);
+						//fputcsv($f, $lineData, $delimiter);
+						fputcsv($f, $lineData, $delimiter);
+					}
+					
+					//move back to beginning of file
+					fseek($f, 0);
+					//set headers to download file rather than displayed
+					//header('Content-Type: text/csv');
+					//header('Content-Disposition: attachment; filename="' . $filename . '";');
+					
+					
+					//output all remaining data on a file pointer
+					fpassthru($f);
+			
+			require 'export.php'; 
+				}
+		}
+		else
+		{
+			require'login.php';
+		}
+	}
+	
 
 	
 	

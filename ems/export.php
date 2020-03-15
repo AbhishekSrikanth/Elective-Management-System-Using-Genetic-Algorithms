@@ -4,6 +4,10 @@ include 'adminheader.php';
         $sql="SELECT * FROM preference";
 		$res=mysqli_query($con,$sql);
 		
+		$sql1="SELECT Max FROM course ";
+		$res1=mysqli_query($con,$sql1);
+		
+		
 		
 					
 ?>
@@ -11,6 +15,7 @@ include 'adminheader.php';
 <div class="well">
 	
 	<form action="db.php" method="post">
+	<input type="submit" class="btn btn-info" name="export_max" value="Export Size">
 	<input type="submit" class="btn btn-info" name="export" value="Export">
 	<input type="submit" class="btn btn-info" name="import" value="Import">
 	</form>
@@ -36,13 +41,15 @@ include 'adminheader.php';
 			{
 				
 					$sid=$row['SID'];
-					$p1=$row['Pref1'];
-					$p2=$row['Pref2'];
-					$p3=$row['Pref3'];
-					$p4=$row['Pref3'];
-					$p5=$row['Pref4'];
+					$p1=$row['Elec1'];
+					$p2=$row['Elec2'];
+					$p3=$row['Elec3'];
+					$p4=$row['Elec4'];
+					$p5=$row['Elec5'];
 					
 			?>
+			
+			
 		<tr class="success">
 		  
 		  <td><?php echo $sid; ?></td>
