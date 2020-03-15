@@ -72,12 +72,6 @@ class AllocateElective:
             self.population.sort(
                 key=lambda i: i[self.totalStudents], reverse=True)
 
-            # self.store_avg_fitness()
-            # print(self.population)
-            # np.savetxt("Z:\EAinPY\pypops" + str(gen+1) +
-            # ".txt",np.array(self.population),fmt='%1.1d',delimiter = ' ',newline
-            # = '\n')
-
             self.currentGeneration += 1
 
         # Stores best allocation to allocations.csv
