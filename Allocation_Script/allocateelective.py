@@ -7,8 +7,12 @@ class AllocateElective:
 
     def __init__(self):
 
+        # Format input from web-app
+        self.__formatPreferences()
+
         # Read elective preferences from CSV file and store in numpy array
-        self.preferences = pd.read_csv(configs.preferences_file, header=None).values
+        self.preferences = pd.read_csv(
+            configs.preferences_file, header=None).values
 
         # Getting specifications from the configs file
         self.totalStudents = configs.totalStudents  # Total number of students
@@ -27,7 +31,8 @@ class AllocateElective:
         # representing a student
         self.chromosome = [int(i) for i in range(0, self.totalStudents)]
 
-        self.population = [[0 for x in range(self.totalStudents+1)] for y in range(self.population_cap)]
+        self.population = [
+            [0 for x in range(self.totalStudents + 1)] for y in range(self.population_cap)]
 
         for i in range(0, self.population_cap):
 
@@ -74,7 +79,11 @@ class AllocateElective:
 
             self.currentGeneration += 1
 
+        # Stores best allocation to allocations.csv
         self.storeBestAllocation()
+
+        # Formats output for web-app
+        # self.__formatAllocation()
 
     # Calculates fitness for current allocation
     def calculateFitness(self):
@@ -180,7 +189,7 @@ class AllocateElective:
         # Get the fitness score
         self.bestFitnessScore = self.calculateFitness()
         # Save it to CSV file
-        np.savetxt(configs.data_dir + "BestAllocation.csv",
+        np.savetxt(configs.data_dir + "allocations.csv",
                    np.array(self.allocation).astype(int), delimiter=',', newline='\n', fmt='%i')
 
     # Loads best chromosomes which are the parents for the next generation.
@@ -268,63 +277,36 @@ class AllocateElective:
                 self.child1[i] = self.parent2[i]
                 self.child2[i] = self.parent1[i]
 
-    # PMX Cross-over
-    def __PMX(self):
+    def __formatPreferences(self):
 
-        pmxl = np.random.randint(self.totalStudents)
-        pmxu = self.totalStudents  # Have To find what this is ...
-        self.child1 = [-1 for i in range(self.totalStudents)]
-        self.child2 = [-1 for i in range(self.totalStudents)]
+        pref_from_web = pd.read_csv(
+            configs.data_dir + 'preferences_from_web.csv')
 
-        # print ('\n ******* \n'+ str(self.parent1))
+        pref_from_web.drop(columns=['SID'], inplace=True)
 
-        for pmxi in range(pmxl, pmxu + 1):
-            self.child1[pmxi] = self.parent1[pmxi]
+        prefValues = pref_from_web.values
 
-        for pmxi in range(pmxl, pmxu + 1, 1):
-            for pmxy in range(self.totalStudents):
-                if(self.parent2[pmxy] == self.child1[pmxi]):
-                    break
-            pmxflag = 1
-            for pmxk in range(pmxl, pmxu + 1, 1):
-                if(self.parent1[pmxk] == self.parent2[pmxi]):
+        prefValues = prefValues.T
 
-                    pmxflag = 0
-            if(pmxflag == 1):
-                if(pmxl <= pmxy and pmxy <= pmxu + 1):
-                    z = self.rec(pmxy, self.child1, self.parent2, pmxl, pmxu)
-                    self.child1[z] = self.parent2[pmxi]
+        (noOfElective, noOfStudents) = prefValues.shape
 
-                else:
-                    self.child1[pmxy] = self.parent2[pmxi]
+        np.savetxt(configs.data_dir + "test.csv",
+                   np.array(prefValues).astype(int), delimiter=',', newline='\n', fmt='%i')
 
-        for pmxi in range(self.totalStudents):
-            if(self.child1[pmxi] == -1):
-                self.child1[pmxi] = self.parent2[pmxi]
+    def __formatAllocation(self):
 
-        for pmxi in range(pmxl, pmxu + 1):
-            self.child2[pmxi] = self.parent2[pmxi]
+        alloc_from_algo = pd.read_csv(
+            configs.data_dir + 'allocation.csv', header=None)
 
-        for pmxi in range(pmxl, pmxu + 1, 1):
-            for pmxy in range(self.totalStudents):
-                if(self.parent1[pmxy] == self.child2[pmxi]):
-                    break
-            pmxflag = 1
-            for pmxk in range(pmxl, pmxu + 1, 1):
-                if(self.parent2[pmxk] == self.parent1[pmxi]):
+        pref_from_web = pd.read_csv(
+            configs.data_dir + 'preferences_from_web.csv')
 
-                    pmxflag = 0
-            if(pmxflag == 1):
-                if(pmxl <= pmxy and pmxy <= pmxu + 1):
-                    z = self.rec(pmxy, self.child2, self.parent1, pmxl, pmxu)
-                    self.child2[z] = self.parent1[pmxi]
+        alloc_to_web = pd.DataFrame()
+        alloc_to_web['SID'] = pref_from_web['SID'].values
+        alloc_to_web['CID'] = [list(i).index(1) + 1 for i in alloc_from_algo.values.T]
 
-                else:
-                    self.child2[pmxy] = self.parent1[pmxi]
+        alloc_to_web.to_csv('test_alloc.csv')
 
-        for pmxi in range(self.totalStudents):
-            if(self.child2[pmxi] == -1):
-                self.child2[pmxi] = self.parent1[pmxi]
 
 if __name__ == '__main__':
     ae = AllocateElective()
